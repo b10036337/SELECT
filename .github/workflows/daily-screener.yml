@@ -1,0 +1,24 @@
+name: Daily Taiwan Stock Screener
+
+on:
+  schedule:
+    - cron: "30 10 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - run: select-tw-update --config config/screener.yaml --data-dir data/processed --output reports/recommendations.csv
+      - run: select-tw-update backtest --config config/screener.yaml --data-dir data/processed --output-dir reports/backtest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recommendations
+          path: |
+            reports/recommendations.csv
+            reports/backtest/
