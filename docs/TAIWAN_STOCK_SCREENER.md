@@ -64,3 +64,33 @@ select-tw-update --config config/screener.yaml --data-dir data/processed --outpu
 - `price_stage`：價格型態門檻。
 - `run.minimum_total_score`：總分下限。
 - `run.require_price_stage`：必要價格階段。
+
+## 回測機制與績效報表
+
+回測使用與每日推薦相同的 `config/screener.yaml`，避免研究邏輯與正式篩選邏輯分歧。若 `fundamentals.csv` 或 `chips.csv` 含有 `date` 欄位，回測會在每個訊號日只取該日前最近一筆資料，降低未來函數風險。
+
+### 回測設定
+
+`backtest` 區塊可調整：
+
+- `rebalance_frequency`：再平衡週期，例如 `D` 每日、`W` 每週、`M` 每月。
+- `holding_days`：每次入選後持有的交易日數。
+- `max_positions`：每期最多持股數，使用等權重組合。
+- `transaction_cost_bps`：單邊交易成本，回測會在買進與賣出各扣一次。
+
+### 執行回測
+
+```bash
+select-tw-update backtest --config config/screener.yaml --data-dir data/processed --output-dir reports/backtest
+```
+
+### 報表輸出
+
+回測會產生以下檔案：
+
+| 檔案 | 說明 |
+| --- | --- |
+| `reports/backtest/backtest_trades.csv` | 每筆交易的訊號日、進場日、出場日、股票、價格、報酬與分數 |
+| `reports/backtest/backtest_equity.csv` | 每期等權投資組合報酬、累積權益與回撤 |
+| `reports/backtest/backtest_summary.csv` | 交易次數、勝率、平均交易報酬、總報酬、最大回撤、獲利因子 |
+| `reports/backtest/backtest_report.md` | Markdown 格式績效摘要 |

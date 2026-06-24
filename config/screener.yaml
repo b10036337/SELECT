@@ -57,3 +57,9 @@ recommendation:
     fundamental: 0.45
     chip: 0.35
     price_setup: 0.20
+
+backtest:
+  rebalance_frequency: W
+  holding_days: 20
+  max_positions: 20
+  transaction_cost_bps: 14.25
